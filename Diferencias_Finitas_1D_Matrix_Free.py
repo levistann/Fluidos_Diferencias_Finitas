@@ -1,80 +1,89 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from coefficients_kth_derivative import coefficients_kth_derivative as coeff
+
 
 #definiendo variables
 
-#funtos de inicio y final
+#parametros iniciales
+'''
 x_start = 0.0
-x_final = 20
-n_points = 200 #numero de puntos a aproximar
+x_end = 20
+paso = 0.1
+order_derivative = 3
+n_puntos = int(round((x_end - x_start)/paso)) + 1
+grid = np.linspace(x_start, x_end, n_puntos)
+'''
 
+#funcion que diferencias finitas
 
-#condiciones de frontera
-a = np.cos(x_start)
-b = np.cos(x_final)
+def finite_difference(x_start, x_end, paso, order_derivative, funcion):
+    n_points = int(round((x_end - x_start)/paso)) + 1 #numero de puntos a aproximar
+    malla = np.linspace(x_start, x_end, n_points)     #dominio de nuestra funcion
+    def u(x):       #definimos la funcion de la cual aproximaremos du/dx
+        return np.sin(x)
 
-step = (x_final - x_start)/(n_points - 1)    #paso
-x = np.linspace(x_start, x_final, n_points)     #dominio de nuestra funcion
-def u(x):       #definimos la funcion de la cual aproximaremos du/dx
-    return np.sin(x)
+    U = funcion(malla)    #evaluamos nuestra funcion sobre el dominio
 
-U = u(x)    #evaluamos nuestra funcion sobre el dominio
+    stencil_size = order_derivative + 1
 
-#Operador hacia atras
-u_prime_left = np.zeros_like(U)
-u_prime_left[1:] = (U[1:] - U[:-1])/step
-u_prime_left[0] = a
+    if order_derivative % 2 != 0:
+        stencil_size += 1
 
+    boundary_margin = stencil_size // 2
+    U_prime = np.zeros_like(U)
 
-#Operador hacia adelante
-u_prime_right = np.zeros_like(U)
-u_prime_right[:-1] = (U[1:] - U[:-1])/step
-u_prime_right[-1] = b
+    intern_coefficients = coeff(order_derivative, malla[boundary_margin], malla)
 
+    for i in range(stencil_size):
+        start_slice = i
+        end_slice = -stencil_size + 1 + i
 
-#Operador central
-u_prime_central = np.zeros_like(U)
-u_prime_central[1:-1] = (U[2:] - U[:-2])/(2*step)
-u_prime_central[0] = a
-u_prime_central[-1] = b
+        if end_slice == 0:
+                end_slice = None
+            
+        U_prime[boundary_margin: -boundary_margin] += intern_coefficients[i] * U[start_slice:end_slice]
+
+    for i in range(boundary_margin):
+        start_coefficients = coeff(order_derivative, malla[i], malla)
+        U_prime[i] = np.dot(start_coefficients, U[:stencil_size])
+
+    for i in range(1, boundary_margin + 1):
+        idx = n_points - i
+        end_coefficients = coeff(order_derivative, malla[idx], malla)
+        U_prime[idx] = np.dot(end_coefficients, U[-stencil_size:])
+        
+    return U_prime
 
 #solucion analitica
-u_exact = np.cos(x)
+'''
+pasos = [0.1, 0.05, 0.01, 0.001]
+for i in range(len(pasos)):
+    n_puntos = int(round((x_end - x_start)/pasos[i])) + 1
+    grid = np.linspace(x_start, x_end, n_puntos)
+    u_exact = -np.cos(grid)
+    u_aproxx = finite_difference(x_start, x_end, pasos[i], order_derivative)
+    error = u_aproxx - u_exact
+    L_inf = np.max(np.abs(error))
+    print(L_inf)
+'''
 
 '''
-fig1, (ax1, ax2) = plt.subplots(1, 2, figsize = (14, 5))
-ax1.plot(x, u_exact, 'k-', label = 'Solucion Analitica')
-ax1.plot(x, u_prime_left, 'bo-', label = r'Solucion aproximada por  $D_{-u(x)}$')
-ax1.set_xlabel('valor de x')
-ax1.set_ylabel('valor de la funcion')
-ax1.set_title(r"Comparacion solucion analitica vs aproximada de:   $\frac{dsin(x)}{dx}$  con  $D_{-u(x)}$")
-ax1.legend()
-ax1.grid(True)
-
-ax2.plot(x, u_exact, 'k-', label = 'Solucion Analitica')
-ax2.plot(x, u_prime_right, 'bo-', label = r'Solucion aproximada por  $D_{+u(x)}$')
-ax2.set_xlabel('valor de x')
-ax2.set_title(r"Comparacion solucion analitica vs aproximada de:   $\frac{dsin(x)}{dx}$  con  $D_{+u(x)}$")
-ax2.legend()
-ax2.grid(True)
-plt.tight_layout()
-
 fig2, ax3 = plt.subplots(figsize = (8, 5))
-ax3.plot(x, u_exact, 'k-', label = 'Solucion Analitica')
-ax3.plot(x, u_prime_central, 'bo-', label = r'Solucion aproximada por  $D_{0u(x)}$')
+ax3.plot(malla, u_exact, 'k-', label = 'Solucion Analitica')
+ax3.plot(malla, U_prime, 'bo-', label = r'Solucion aproximada por  $D_{0u(x)}$')
 ax3.set_xlabel('valor de x')
 ax3.set_ylabel('valor de la funcion')
-ax3.set_title(r"Comparacion solucion analitica vs aproximada de:   $\frac{dsin(x)}{dx}$  con  $D_{0u(x)}$" + f"y h = {step}")
+ax3.set_title(r"Comparacion solucion analitica vs aproximada de:   $\frac{dsin(x)}{dx}$  con  $D_{0u(x)}$" + f"y h = {paso}")
 ax3.legend()
 ax3.grid(True)
 plt.show()
-'''
 
 #Extraer el error
-error = u_prime_central - u_exact
-
+error = U_prime - u_exact
 L_inf = np.max(np.abs(error))
-L_sqrd = np.sqrt(step*np.sum(error**2))
+L_sqrd = np.sqrt(paso*np.sum(error**2))
 
 print(L_inf)
 print(L_sqrd)
+'''
