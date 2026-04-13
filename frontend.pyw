@@ -14,7 +14,12 @@ def plot_results():
         x_end = float(entry_end.get())
         paso = float(entry_paso.get())
         order = int(entry_order.get())
+        limite_inferior = float(entry_liminf.get())
+        limite_superior = float(entry_limsup.get())
         func_str = entry_func.get()
+
+        if limite_superior <= limite_inferior:
+            raise ValueError("El limite inferior no puede ser mayor o igual al limite superior")
 
         if paso <= 0 or x_end <= x_start or order < 1:
             raise ValueError("Los parámetros ingresados no tienen sentido físico o matemático.")
@@ -50,7 +55,7 @@ def plot_results():
         plt.figure(figsize=(10, 6))
         plt.plot(malla, u_prime_exact, label=f'Exacta (Orden {order})', color='black', linewidth=2)
         plt.plot(malla, u_prime_aprox, '--', label='Aproximación Matrix-Free', color='red', linewidth=2)
-        
+        plt.ylim(limite_inferior, limite_superior)
         plt.xlabel('x')
         plt.ylabel(f'Derivada de orden {order}')
         plt.title(f'Diferencias Finitas vs Solución Exacta: {func_str}')
@@ -89,13 +94,23 @@ entry_paso = tk.Entry(root, width=25)
 entry_paso.insert(0, "0.1")
 entry_paso.grid(row=3, column=1, padx=10, pady=10)
 
-tk.Label(root, text="Orden de la derivada (k):").grid(row=4, column=0, padx=10, pady=10, sticky="e")
+tk.Label(root, text = "Limite inferior de gráfica").grid(row = 4, column = 0, padx= 10, pady= 10, sticky= "e")
+entry_liminf = tk.Entry(root, width = 25)
+entry_liminf.insert(0, "0")
+entry_liminf.grid(row = 4, column = 1, padx= 10, pady= 10)
+
+tk.Label(root, text = "Limite superior de gráfica").grid(row = 5, column = 0, padx= 10, pady= 10, sticky= "e")
+entry_limsup = tk.Entry(root, width = 25)
+entry_limsup.insert(0, "50")
+entry_limsup.grid(row = 5, column = 1, padx= 10, pady= 10)
+
+tk.Label(root, text="Orden de la derivada (k):").grid(row=6, column=0, padx=10, pady=10, sticky="e")
 entry_order = tk.Entry(root, width=25)
 entry_order.insert(0, "1")
-entry_order.grid(row=4, column=1, padx=10, pady=10)
+entry_order.grid(row=6, column=1, padx=10, pady=10)
 
 # Botón
 btn_plot = tk.Button(root, text="Calcular y Graficar", command=plot_results, width=20)
-btn_plot.grid(row=5, column=0, columnspan=2, pady=20)
+btn_plot.grid(row=7, column=0, columnspan=2, pady=20)
 
 root.mainloop()

@@ -49,7 +49,7 @@ def coefficients_kth_derivative(order_derivative, xbar, malla):
 
     return coefficients
 
-
+'''
 paso = 0.1
 x_start = 1.0
 x_end = 20.0
@@ -59,3 +59,4 @@ orden_derivada = 4
 
 c = coefficients_kth_derivative(orden_derivada, 19.9, malla)
 print(c)
+'''

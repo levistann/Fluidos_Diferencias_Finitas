@@ -48,23 +48,25 @@ def finite_difference(x_start, x_end, paso, order_derivative, funcion):
         idx = n_points - i
         end_coefficients = coeff(order_derivative, malla[idx], malla)
         U_prime[idx] = np.dot(end_coefficients, U[-stencil_size:])
-        
+    
+    #print(U_prime)
     return U_prime
 
 
-'''
+
 def funcion(malla):
     return malla**4
 
 derivada_calculada = finite_difference(x_start, x_end, paso, order_derivative, funcion)
 
 plt.plot(malla, derivada_calculada, label = "derivada aproximada")
+plt.ylim(0, 0)
 plt.title("Derivada aproximada")
 plt.xlabel("eje x")
 plt.ylabel("eje y")
 plt.legend()
 plt.show()
-'''
+
 #solucion analitica
 '''
 pasos = [0.1, 0.05, 0.01, 0.001]
