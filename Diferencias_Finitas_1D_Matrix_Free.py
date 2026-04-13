@@ -6,14 +6,13 @@ from coefficients_kth_derivative import coefficients_kth_derivative as coeff
 #definiendo variables
 
 #parametros iniciales
-'''
+
 x_start = 0.0
 x_end = 20
 paso = 0.1
-order_derivative = 3
-n_puntos = int(round((x_end - x_start)/paso)) + 1
-grid = np.linspace(x_start, x_end, n_puntos)
-'''
+order_derivative = 4
+n_points = int(round((x_end - x_start)/paso)) + 1 #numero de puntos a aproximar
+malla = np.linspace(x_start, x_end, n_points)     #dominio de nuestra funcion
 
 #funcion que diferencias finitas
 
@@ -55,6 +54,18 @@ def finite_difference(x_start, x_end, paso, order_derivative, funcion):
         
     return U_prime
 
+def funcion(malla):
+    return malla**4
+
+derivada_calculada = finite_difference(x_start, x_end, paso, order_derivative, funcion)
+
+plt.plot(malla, derivada_calculada, label = "derivada aproximada")
+plt.title("Derivada aproximada")
+plt.xlabel("eje x")
+plt.ylabel("eje y")
+plt.legend()
+plt.show()
+
 #solucion analitica
 '''
 pasos = [0.1, 0.05, 0.01, 0.001]
@@ -69,16 +80,6 @@ for i in range(len(pasos)):
 '''
 
 '''
-fig2, ax3 = plt.subplots(figsize = (8, 5))
-ax3.plot(malla, u_exact, 'k-', label = 'Solucion Analitica')
-ax3.plot(malla, U_prime, 'bo-', label = r'Solucion aproximada por  $D_{0u(x)}$')
-ax3.set_xlabel('valor de x')
-ax3.set_ylabel('valor de la funcion')
-ax3.set_title(r"Comparacion solucion analitica vs aproximada de:   $\frac{dsin(x)}{dx}$  con  $D_{0u(x)}$" + f"y h = {paso}")
-ax3.legend()
-ax3.grid(True)
-plt.show()
-
 #Extraer el error
 error = U_prime - u_exact
 L_inf = np.max(np.abs(error))

@@ -49,14 +49,13 @@ def coefficients_kth_derivative(order_derivative, xbar, malla):
 
     return coefficients
 
-'''
+
 paso = 0.1
 x_start = 1.0
-x_end = 2.0
+x_end = 20.0
 points = int(round((x_end - x_start)/paso)) + 1
 malla = np.linspace(x_start, x_end, points)
 orden_derivada = 4
 
-c = coefficients_kth_derivative(orden_derivada, 1.5, malla)
+c = coefficients_kth_derivative(orden_derivada, 19.9, malla)
 print(c)
-'''
