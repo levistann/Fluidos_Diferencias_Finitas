@@ -19,9 +19,6 @@ malla = np.linspace(x_start, x_end, n_points)     #dominio de nuestra funcion
 def finite_difference(x_start, x_end, paso, order_derivative, funcion):
     n_points = int(round((x_end - x_start)/paso)) + 1 #numero de puntos a aproximar
     malla = np.linspace(x_start, x_end, n_points)     #dominio de nuestra funcion
-    def u(x):       #definimos la funcion de la cual aproximaremos du/dx
-        return np.sin(x)
-
     U = funcion(malla)    #evaluamos nuestra funcion sobre el dominio
 
     stencil_size = order_derivative + 1
@@ -54,6 +51,8 @@ def finite_difference(x_start, x_end, paso, order_derivative, funcion):
         
     return U_prime
 
+
+'''
 def funcion(malla):
     return malla**4
 
@@ -65,7 +64,7 @@ plt.xlabel("eje x")
 plt.ylabel("eje y")
 plt.legend()
 plt.show()
-
+'''
 #solucion analitica
 '''
 pasos = [0.1, 0.05, 0.01, 0.001]
